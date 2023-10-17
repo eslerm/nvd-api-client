@@ -1,6 +1,8 @@
 # nvd-api-client
 
-NVD API 2.0 client for CVE based on suggested NVD's *Best Practices*: [https://nvd.nist.gov/developers/start-here](https://nvd.nist.gov/developers/start-here)
+NVD API 2.0 client for CVE information.
+
+Based on NVD's suggested *Best Practices*: [https://nvd.nist.gov/developers/start-here](https://nvd.nist.gov/developers/start-here)
 
 # Configuration
 
@@ -15,7 +17,7 @@ As of 2023-10-17 a local mirror requires 1.3G of space.
 
 # Example
 
-```bash
+```console
 $ python3 nvd_api_client.py --help
 usage: nvd_api_client.py [-h] [--init] [-s MAINTAIN_SINCE] [--auto] [--debug] [--verbose]
 
@@ -30,7 +32,7 @@ options:
   --debug               add debug info
   --verbose             add verbose debug info
 ```
-```bash
+```console
 $ python3 nvd_api_client.py --auto --verbose
 DEBUG: local NVD mirror path is /home/eslerm/mirrors/nvd
 DEBUG: searching NVD dataset for most recent lastModified value
