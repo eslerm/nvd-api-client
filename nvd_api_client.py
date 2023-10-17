@@ -95,15 +95,11 @@ def debug(msg: str) -> None:
 
 def find_conf() -> Path:
     """find configuration file"""
-    for filename in [".ubuntu-cve-tracker.conf", ".config/nvd-api-client.conf"]:
-        path = Path.home() / filename
-        if path.is_file():
-            return path
-    raise ValueError(
-        """
-No configuration file.
-Create ~/.ubuntu-cve-tracker.conf or ~/.config/nvd-api-client.conf"""
-    )
+    filename = ".config/nvd-api-client.conf"
+    path = Path.home() / filename
+    if path.is_file():
+        return path
+    raise ValueError(f"No configuration file. Create {Path.home()}/{filename}")
 
 
 def load_path(conf: Path) -> Path:
