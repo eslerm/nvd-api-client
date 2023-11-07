@@ -304,7 +304,9 @@ def format_date(date_str: str) -> datetime:
         )
     except ValueError:
         try:
-            date = datetime.fromisoformat(date_str).replace(tzinfo=timezone.utc)
+            date = datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%S.%f").replace(
+                tzinfo=timezone.utc, microsecond=1
+            )
         except ValueError as exc:
             msg = f"not a valid date: {date_str}"
             raise argparse.ArgumentTypeError(msg) from exc
