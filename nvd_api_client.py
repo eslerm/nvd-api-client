@@ -322,7 +322,7 @@ def nvd_last_modified_file() -> datetime:
         debug("searching NVD dataset for most recent lastModified value")
     # compare strings instead of datetimes
     last_modified_string = "0"
-    for path in nvd_path.rglob("*"):
+    for path in nvd_path.rglob("*.json"):
         if path.is_dir():
             continue
         try:
