@@ -4,6 +4,8 @@ NVD API 2.0 client for CVE information.
 
 Based on NVD's suggested *Best Practices*: [https://nvd.nist.gov/developers/start-here](https://nvd.nist.gov/developers/start-here)
 
+Developed for and forked from the [Ubuntu CVE Tracker](https://git.launchpad.net/ubuntu-cve-tracker/tree/scripts/nvd_api_client.py).
+
 # Configuration
 
 Configure path to local NVD mirror by creating an INI file located in `~/.config/nvd-api-client.conf` similar to:
