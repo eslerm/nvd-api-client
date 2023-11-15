@@ -49,7 +49,7 @@ All modes accept --debug or --verbose which print information in stderr.
 
 __author__ = "Mark Esler"
 __copyright__ = "Copyright (C) 2023 Canonical Ltd."
-__license__ = "BSD-3-Clause"
+__license__ = "GPL-3.0-only"
 __version__ = "1.0-git"
 
 
