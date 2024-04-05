@@ -15,7 +15,7 @@ Configure path to local NVD mirror by creating an INI file located in `~/.config
 nvd_path=/home/eslerm/mirrors/nvd/
 ```
 
-As of 2023-10-17 a local mirror requires 1.3G of space.
+As of 2024-04-05 a local mirror requires 1.7G of space. Download a clone from [nvd-mirror](https://github.com/eslerm/nvd-mirror).
 
 # Example
 
