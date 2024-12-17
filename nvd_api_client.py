@@ -163,7 +163,7 @@ def save_cve(page_json: dict, nvd_path: Path) -> None:
         if VERBOSE:
             debug(f'saving {cve["id"]}')
         with open(file_path, "w", encoding="utf-8") as file:
-            json.dump(cve, file)
+            json.dump(cve, file, indent=PRETTY)
 
 
 def save_pages(query: Optional[str] = None) -> None:
@@ -364,6 +364,9 @@ if __name__ == "__main__":
     parser.add_argument("--auto", help="automated maintenance", action="store_true")
     parser.add_argument("--debug", help="add debug info", action="store_true")
     parser.add_argument("--verbose", help="add verbose debug info", action="store_true")
+    parser.add_argument(
+        "--pretty", help="pretty json output", default=True, action="store_true"
+    )
 
     args = parser.parse_args()
 
@@ -376,6 +379,11 @@ if __name__ == "__main__":
     else:
         VERBOSE = False
         DEBUG = False
+
+    if args.pretty:
+        PRETTY = 4
+    else:
+        PRETTY = None
 
     if args.init:
         nvd_init()
