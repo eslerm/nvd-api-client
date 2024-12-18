@@ -61,6 +61,7 @@ from pathlib import Path
 import sys
 import time
 from typing import Optional
+import urllib.parse
 import requests
 
 
@@ -166,7 +167,7 @@ def save_cve(page_json: dict, nvd_path: Path) -> None:
             json.dump(cve, file, indent=PRETTY)
 
 
-def save_pages(query: Optional[str] = None) -> None:
+def save_pages(date_range: Optional[tuple] = None) -> None:
     """
     get all pages of CVE results and save them
 
@@ -179,18 +180,14 @@ def save_pages(query: Optional[str] = None) -> None:
     start_index = 0
     results_per_page = 2000
     total_results = results_per_page + 1
+    p = {"resultsPerPage": results_per_page, "startIndex": start_index}
+    if date_range:
+        p["lastModStartDate"] = date_range[0]
+        p["lastModEndDate"] = date_range[1]
+    params = urllib.parse.urlencode(p)
 
     while start_index < total_results:
-        if query:
-            url = (
-                f"{base_url}?{query}&"
-                + f"resultsPerPage={results_per_page}&startIndex={start_index}"
-            )
-        else:
-            url = (
-                f"{base_url}?"
-                + f"resultsPerPage={results_per_page}&startIndex={start_index}"
-            )
+        url = f"{base_url}?{params}"
 
         page = get_url(url)
         page_json = page.json()
@@ -271,11 +268,7 @@ def nvd_maintain(since: datetime) -> None:
     if DEBUG:
         debug(f"searching for modified NVD CVEs between {start_date} and {end_date}")
 
-    query = f"lastModStartDate={start_date}&lastModEndDate={end_date}".replace(
-        "+", "%2B"
-    )
-
-    save_pages(query)
+    save_pages((start_date, end_date))
 
 
 def check_last_modified(last_modified: datetime) -> None:
