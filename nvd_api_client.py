@@ -103,12 +103,13 @@ def find_conf() -> Path:
     raise ValueError(f"No configuration file. Create {Path.home()}/{filename}")
 
 
-def load_path(conf: Path) -> Path:
+def load_config_path() -> Path:
     """read configuration file for path to local NVD mirror"""
+    conf_path = find_conf()
     config = configparser.ConfigParser()
     try:
         # nb: encoding is unset
-        with open(conf) as file:
+        with open(conf_path) as file:
             config.read_file(file)
     except OSError as exc:
         msg = f"error reading {conf}"
@@ -117,15 +118,18 @@ def load_path(conf: Path) -> Path:
         path = Path(config["DEFAULT"]["nvd_path"])
     except KeyError as exc:
         raise KeyError("nvd_path not defined in configuration file") from exc
-    if DEBUG:
-        debug(f"local NVD mirror path is {path}")
     return path
 
 
 def verify_dirs() -> Path:
     """create directory structure if needed and return local NVD mirror path"""
-    config_path = find_conf()
-    nvd_path = load_path(config_path)
+    if args.path:
+        nvd_path = Path(args.path)
+    else:
+        nvd_path = load_config_path()
+
+    if DEBUG:
+        debug(f"local NVD mirror path is {nvd_path}")
 
     nvd_path.mkdir(parents=True, exist_ok=True)
 
@@ -354,6 +358,7 @@ if __name__ == "__main__":
         help="maintain NVD dataset since YY-MM-DD or ISO-8601 datetime",
         type=format_date,
     )
+    parser.add_argument("--path", help="set path", type=Path)
     parser.add_argument("--auto", help="automated maintenance", action="store_true")
     parser.add_argument("--debug", help="add debug info", action="store_true")
     parser.add_argument("--verbose", help="add verbose debug info", action="store_true")
