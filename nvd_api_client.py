@@ -68,17 +68,12 @@ import requests
 # API Client Headers
 HEADERS = {"Accept-Language": "en-US", "User-Agent": "nvd-api-client"}
 
-
-# NVD_API_KEY not implemented
-NVD_API_KEY = None
-
-
 # seconds to wait after a request
 # maximally efficient timing isn't critical
 # NVD's public rate limit is 5 requests in a rolling 30 second window
 # public default based on 5 / 30 * 2 = 12, round down to 10 requests a minute
 # sleeping 6.0 seconds aligns with NVD's Best Practices
-if NVD_API_KEY:
+if load_config().get("api_key", None):
     # 50 requests in a rolling 30 second window
     RATE_LIMIT = 0.60
 else:
@@ -103,8 +98,8 @@ def find_conf() -> Path:
     raise ValueError(f"No configuration file. Create {Path.home()}/{filename}")
 
 
-def load_config_path() -> Path:
-    """read configuration file for path to local NVD mirror"""
+def load_config() -> dict:
+    """read configuration file."""
     conf_path = find_conf()
     config = configparser.ConfigParser()
     try:
@@ -116,9 +111,12 @@ def load_config_path() -> Path:
         raise OSError(msg) from exc
     try:
         path = Path(config["DEFAULT"]["nvd_path"])
+        config["path"] = path
     except KeyError as exc:
         raise KeyError("nvd_path not defined in configuration file") from exc
-    return path
+    if "api_key" in config["DEFAULT"]:
+        config["api_key"] = config["DEFAULT"]["api_key"]
+    return config   
 
 
 def verify_dirs() -> Path:
@@ -126,7 +124,7 @@ def verify_dirs() -> Path:
     if args.path:
         nvd_path = Path(args.path)
     else:
-        nvd_path = load_config_path()
+        nvd_path = load_config()["path"]
 
     if DEBUG:
         debug(f"local NVD mirror path is {nvd_path}")
@@ -184,13 +182,18 @@ def save_pages(date_range: Optional[tuple] = None) -> None:
     start_index = 0
     results_per_page = 2000
     total_results = results_per_page + 1
-    p = {"resultsPerPage": results_per_page, "startIndex": start_index}
-    if date_range:
-        p["lastModStartDate"] = date_range[0]
-        p["lastModEndDate"] = date_range[1]
-    params = urllib.parse.urlencode(p)
+
+    api_key = load_config().get("api_key", None)
 
     while start_index < total_results:
+
+        p = {"resultsPerPage": results_per_page, "startIndex": start_index}
+        if date_range:
+            p["lastModStartDate"] = date_range[0]
+            p["lastModEndDate"] = date_range[1]
+        if api_key:
+            p["apiKey"] = api_key
+        params = urllib.parse.urlencode(p)
         url = f"{base_url}?{params}"
 
         page = get_url(url)
