@@ -99,6 +99,7 @@ def load_config() -> dict:
     """read configuration file."""
     conf_path = find_conf()
     config = configparser.ConfigParser()
+    config_d = {"path":None, "api_key":None}
     try:
         # nb: encoding is unset
         with open(conf_path) as file:
@@ -108,12 +109,12 @@ def load_config() -> dict:
         raise OSError(msg) from exc
     try:
         path = Path(config["DEFAULT"]["nvd_path"])
-        config["path"] = path
+        config_d["path"] = path
     except KeyError as exc:
         raise KeyError("nvd_path not defined in configuration file") from exc
     if "api_key" in config["DEFAULT"]:
-        config["api_key"] = config["DEFAULT"]["api_key"]
-    return config   
+        config_d["api_key"] = config["DEFAULT"]["api_key"]
+    return config_d
 
 
 def verify_dirs() -> Path:
