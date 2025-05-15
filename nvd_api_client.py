@@ -73,11 +73,8 @@ HEADERS = {"Accept-Language": "en-US", "User-Agent": "nvd-api-client"}
 # NVD's public rate limit is 5 requests in a rolling 30 second window
 # public default based on 5 / 30 * 2 = 12, round down to 10 requests a minute
 # sleeping 6.0 seconds aligns with NVD's Best Practices
-if load_config().get("api_key", None):
-    # 50 requests in a rolling 30 second window
-    RATE_LIMIT = 0.60
-else:
-    RATE_LIMIT = 6.0
+# a smaller value can be used and will be set further down if an API key is provided
+RATE_LIMIT = 6.0
 
 
 # requests timeout
@@ -102,6 +99,7 @@ def load_config() -> dict:
     """read configuration file."""
     conf_path = find_conf()
     config = configparser.ConfigParser()
+    config_d = {"path":None, "api_key":None}
     try:
         # nb: encoding is unset
         with open(conf_path) as file:
@@ -111,12 +109,12 @@ def load_config() -> dict:
         raise OSError(msg) from exc
     try:
         path = Path(config["DEFAULT"]["nvd_path"])
-        config["path"] = path
+        config_d["path"] = path
     except KeyError as exc:
         raise KeyError("nvd_path not defined in configuration file") from exc
     if "api_key" in config["DEFAULT"]:
-        config["api_key"] = config["DEFAULT"]["api_key"]
-    return config   
+        config_d["api_key"] = config["DEFAULT"]["api_key"]
+    return config_d
 
 
 def verify_dirs() -> Path:
@@ -370,6 +368,10 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
+
+    if load_config().get("api_key", None):
+        # 50 requests in a rolling 30 second window
+        RATE_LIMIT = 0.60
 
     if args.verbose:
         VERBOSE = True
